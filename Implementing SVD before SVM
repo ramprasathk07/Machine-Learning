@@ -1,0 +1,42 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import scipy.linalg as s
+
+
+z=pd.read_csv("Social_Network_Ads.csv")
+
+x=z.iloc[:,1:-1]
+
+y=z.iloc[:,-1]
+x.replace(['Male','Female'],[0,1],inplace=True)
+y.replace(['Not Purchased','Purchased'],[0,1],inplace=True)
+# print(y.head())
+print(x)
+
+import sklearn
+from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics import accuracy_score
+
+
+
+u,s,v=np.linalg.svd(x)
+# print(s)
+# print(u,"\n",v)
+
+SVD = TruncatedSVD(n_components=1)
+v = SVD.fit_transform(x)
+# print(v)
+
+s1=np.diag(s)/np.sum(s)*100
+
+plt.plot(s1,marker='o')
+plt.show()
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(v, y, test_size=0.20, random_state=1)
+from sklearn.svm import SVC
+model_SVC = SVC()
+model_SVC.fit(X_train,y_train)
+y_pred = model_SVC.predict(X_test)
+print(accuracy_score(y_pred,y_test))
